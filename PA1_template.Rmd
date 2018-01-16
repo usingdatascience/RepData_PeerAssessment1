@@ -158,7 +158,27 @@ Setting the NA values to the mean interval for that day, appears to have made th
 Relating to the median + mean values, imnputing the values seems to have had the effect of making them equal.
 
 ```{r}
-
+new_df$wdays <- weekdays(as.Date(new_df$date))
+for(i in 1:nrow(new_df)) {
+    if (new_df[i,4] == "Saturday" | new_df[i,4] == "Sunday") {
+        new_df[i,4] <- "Weekend"
+    }
+    else {
+        new_df[i,4] <- "Weekday"
+    }
+}
+head(new_df,n=5)
+tail(new_df,n=5)
+```
+```{r}
+act_date <- aggregate(steps~interval + wdays, new_df, mean, na.rm = TRUE)
+plot<- ggplot(act_date, aes(x = interval , y = steps, color = wdays)) +
+       geom_line() +
+       labs(title = "Average daily steps by weekend / weekday", 
+                    x = "Interval", 
+                    y = "Average number of steps") +
+                    facet_wrap(~wdays, ncol = 1, nrow=2)
+print(plot)
 ```
 
 
