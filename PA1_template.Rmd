@@ -9,14 +9,14 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Load up Libraries
+## Load up Libraries
 
 ```{r echo=TRUE}
 library(dplyr)
 library(ggplot2)
 ```
 
-# Step 1 :- Read in data from activity file, and get summary information on file etc
+## Step 1 :- Read in data from activity file, and get summary information on file etc
 
 ```{r echo=TRUE}
 ds <- read.csv("activity.csv", stringsAsFactors = FALSE)
@@ -32,7 +32,7 @@ str(ds)
 summary(ds)
 ```
 
-# Remove the NA values from dataset
+Remove the NA values from dataset
 
 ```{r echo=TRUE}
 ds_na <- ds[complete.cases((ds)),]
@@ -45,6 +45,8 @@ str(ds_na)
 - Calculate the total number of steps taken per day
 - Make a histogram of the total number of steps taken each day
 - Calculate and report the mean and median of the total number of steps taken per day
+
+Following code will calculate total steps per day
 
 ```{r echo=TRUE}
 grp <- group_by(ds_na,date)
@@ -136,7 +138,7 @@ tail(new_df, n=5)
 ```
 Now creating a Histogram of total number of steps each day, for this new dataset
 
-```{r}
+```{r echo=TRUE}
 grp2 <- group_by(new_df,date)
 sum_steps_nf <- summarise(grp2,sum(steps))
 head(sum_steps_nf,n=5)
@@ -147,7 +149,7 @@ hist(x=sum_steps_nf$`sum(steps)`,
      breaks=20,
      xlab="Daily - Total Steps",
      ylab="Frequency",
-     main="Histogram of Total Number of steps daily (newly populated DataFrame")
+     main="Histogram: Total Number of steps daily (new DataFrame)")
 # Calculate median of total number of steps per day
 summarise(sum_steps_nf,median(sum_steps_nf$`sum(steps)`))
 # Calculate mean total number of steps taken per day
@@ -157,7 +159,13 @@ Setting the NA values to the mean interval for that day, appears to have made th
 (ie. histogram) more of a normal distribution.
 Relating to the median + mean values, imnputing the values seems to have had the effect of making them equal.
 
-```{r}
+# Q4. Are there differences in activity patterns between weekdays and weekends?
+- For this part the 𝚠𝚎𝚎𝚔𝚍𝚊𝚢𝚜() function may be of some help here. Use the dataset with the filled-in missing values for this part.
+
+- Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+- Make a panel plot containing a time series plot (i.e. 𝚝𝚢𝚙𝚎 = "𝚕") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+
+```{r echo=TRUE}
 new_df$wdays <- weekdays(as.Date(new_df$date))
 for(i in 1:nrow(new_df)) {
     if (new_df[i,4] == "Saturday" | new_df[i,4] == "Sunday") {
@@ -170,11 +178,11 @@ for(i in 1:nrow(new_df)) {
 head(new_df,n=5)
 tail(new_df,n=5)
 ```
-```{r}
+```{r echo=TRUE}
 act_date <- aggregate(steps~interval + wdays, new_df, mean, na.rm = TRUE)
 plot<- ggplot(act_date, aes(x = interval , y = steps, color = wdays)) +
        geom_line() +
-       labs(title = "Average daily steps by weekend / weekday", 
+       labs(title = "Average daily steps by Type of Date", 
                     x = "Interval", 
                     y = "Average number of steps") +
                     facet_wrap(~wdays, ncol = 1, nrow=2)
